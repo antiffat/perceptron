@@ -20,16 +20,10 @@ public class Perceptron {
     }
 
     public int predict(double[] inputs) {
-        System.out.print("Input array: ");
-        for (int i = 0; i < inputs.length; i++) System.out.print(inputs[i] + " ");
-        System.out.print("Weights array: ");
-        for (int i = 0; i < weights.length; i++) System.out.print(weights[i] + " ");
         double sum = 0;
-        for (int i = 0; i < this.weights.length; i++) {
-            sum += this.weights[i] * inputs[i];
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i] * inputs[i];
         }
-
-        System.out.println("Sum for the prediction: " + sum + " and threshold: " + threshold);
         if (sum >= this.threshold) {
             return 1;
         }
@@ -38,19 +32,15 @@ public class Perceptron {
 
     public void train(double[] inputs, int expectedOutput) {
         int prediction = predict(inputs);
-        System.out.println("prediction: " + prediction);
         int error = expectedOutput - prediction;
-        System.out.println("error: " + error);
 
         for (int i = 0; i < weights.length; i++) {
             if (error != 0) {
                 weights[i] += this.learningRate * error * inputs[i];
-                System.out.println("Updated weight no " + i + ": " + weights[i]);
             }
         }
-        System.out.println("Threshold before update: " + this.threshold);
-        this.threshold += error * learningRate;
-        System.out.println("Updated threshold: " + this.threshold);
+
+        this.threshold += error * learningRate * (-1);
     }
 
     public static List<DataPoint> loadData(String fileName) throws IOException {
@@ -106,7 +96,6 @@ public class Perceptron {
         try {
             List<DataPoint> trainData = loadData(trainDataPath);
             List<DataPoint> testData = loadData(testDataPath);
-
             Perceptron perceptron = new Perceptron(trainData.get(0).inputs.length, learningRate);
 
             for (int epoch = 0; epoch < epochs; epoch++) {
@@ -119,7 +108,6 @@ public class Perceptron {
                 for (DataPoint dp : testData) {
                     if (perceptron.predict(dp.inputs) == dp.label) correct++;
                 }
-
                 double accuracy = (double) correct / testData.size() * 100;
                 System.out.println("Epoch " + (epoch + 1) + " - Accuracy: " + String.format("%.2f%%", accuracy));
             }
@@ -139,7 +127,6 @@ public class Perceptron {
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println(e.getStackTrace());
             System.out.println("Please enter valid numbers for learning rate and epochs.");
         }
 
